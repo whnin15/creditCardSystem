@@ -2,7 +2,6 @@ from datetime import datetime
 from enum import Enum
 from DBActions import DBActions
 from User import User
-from CreditCard import CreditCard
 from Util import Util
 
 class TransactionType(Enum):
@@ -22,7 +21,6 @@ class Transaction(DBActions):
 		return "<Transaction (username='{}', amount='{}', transactionType='{}' transactionDate='{:%Y-%m-%d}'>".format(self.username, self.amount, self.transactionType.name, self.transactionDate)
 
 	def create(self, session):
-		print(self)
 		super().create(session)
 		changeInBalance = self.amount*self.transactionType.value
 		Util.updateCreditCard(self.username, changeInBalance, self.transactionDate, session)
@@ -37,7 +35,7 @@ class Transaction(DBActions):
 		elif fieldName=='transactionDate':
 			self.transactionDate = newVal
 		else:
-			raise 'Transaction.py: getByFieldName - not valid field'
+			raise Exception('Transaction.py: update failed - not valid field:', fieldName)
 
 		session.flush()
 

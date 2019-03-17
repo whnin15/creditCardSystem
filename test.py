@@ -8,6 +8,7 @@ from Transaction import Transaction
 from Transaction import TransactionType
 from Util import Util
 from datetime import datetime
+from datetime import timedelta
 
 class Test:
 
@@ -18,28 +19,32 @@ class Test:
 	Session = sessionmaker(bind=db.getEngine())
 	session = Session()
 
+	#adding user accounts
+	u1 = User(username='wint', password='wint', fullname='WYH', email='test') # creating a user instance
+	u1.create(session)
+
 	#creating a credit card
-	c1=CreditCard(34, 1000)
+	c1=CreditCard(u1.username, 35, 1000, 500)
 	c1.create(session)
 	c1=session.query(CreditCard).first()
 
-	#adding user accounts
-	u1 = User(username='wint', password='wint', fullname='WYH', email='test', creditCardNumber=c1.accountNumber) # creating a user instance
-	u2 = User(username='test', password='wint', fullname='Testing', email='test@') # creating a user instance
-	u3 = User(username='nnn', password='newpwd', fullname='WYH', email='test~') # creating a user instance
-	u1.create(session)
-	u2.create(session)
+	# u2 = User(username='test', password='wint', fullname='Testing', email='test@') # creating a user instance
+	# u3 = User(username='nnn', password='newpwd', fullname='WYH', email='test~') # creating a user instance
+	# u2.create(session)
 
 	#updating User u1 object
 	u1.update('password','pwd', session)
 
 	#testing transactions
-	u1=session.query(User).filter_by(username='wint').first()
+	# u1=session.query(User).filter_by(username='wint').first()
 
-	t2 = Transaction(u1.username, 200, TransactionType.PAYMENT)
-	t2.create(session)
-	t1 = Transaction(u1.username, 1000, TransactionType.CHARGE, datetime.strptime('2019-04-01', '%Y-%m-%d'))
-	t1.create(session)
+	# t1 = Transaction(u1.username, 200, TransactionType.PAYMENT, c1.openDate+timedelta(days=15) )
+	# t1.create(session)
+	# t2 = Transaction(u1.username, 100, TransactionType.CHARGE, c1.openDate+timedelta(days=25) )
+	# t2.create(session)
+	# t3 = Transaction(u1.username, 400, TransactionType.PAYMENT, c1.openDate+timedelta(days=35) )
+	# t3.create(session) 
 
-	print( Util.getInterest(u1.username, datetime.today(), datetime.strptime('2019-03-20', '%Y-%m-%d'), session ) )
+	# # print( Util.getInterest( u1.username, c1.lastTransactionDate, c1.openDate+timedelta(days=35), session ) )
+
 	session.commit() #close the sesssion

@@ -13,10 +13,9 @@ class User(DBActions):
 		self.zipCode = zipCode
 		self.preferredPhoneNumber = preferredPhoneNumber
 		self.phoneNumber1 = phoneNumber1
-		self.creditCardNumber = creditCardNumber
 
 	def __repr__(self):
-		return "<User(username='{}', fullname='{}', email='{}', address='{}','{}','{}','{}', preferredPhone='{}', creditCardNumber='{}')>".format(self.username, self.fullname, self.email, self.streetAddress, self.city, self.state, self.zipCode, self.preferredPhoneNumber, self.creditCardNumber)
+		return "<User(username='{}', fullname='{}', email='{}', address='{}','{}','{}','{}', preferredPhone='{}')>".format(self.username, self.fullname, self.email, self.streetAddress, self.city, self.state, self.zipCode, self.preferredPhoneNumber)
 
 	def update(self, fieldName, newVal, session):
 		if fieldName=='username':
@@ -40,9 +39,7 @@ class User(DBActions):
 			self.preferredPhoneNumber = newVal
 		elif fieldName=='phoneNumber1':
 			self.phoneNumber1 = newVal
-		elif fieldName=='creditCardNumber':
-			self.creditCardNumber = newVal
 		else:
-			raise 'User.py: getByFieldName - not valid field'
+			raise Exception('User.py: update failed - not valid field:', fieldName)
 
 		session.flush()

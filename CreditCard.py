@@ -2,6 +2,7 @@ from datetime import datetime
 from datetime import timedelta
 from enum import Enum
 from DBActions import DBActions
+from User import User
 
 class AccountType(Enum):
 	checking = 1
@@ -10,7 +11,8 @@ class AccountType(Enum):
 
 class CreditCard(DBActions):
 
-	def __init__(self, apr, creditLimit, charge=0, interest=0, openDate=datetime.today(), lastTransactionDate=None, dueDate=None):
+	def __init__(self, username, apr, creditLimit, charge=0, interest=0, openDate=datetime.today(), lastTransactionDate=None, dueDate=None):
+		self.username = username
 		self.apr = apr/100
 		self.creditLimit = creditLimit
 		self.balance = charge
@@ -23,17 +25,19 @@ class CreditCard(DBActions):
 			self.dueDate = dueDate
 
 	def __repr__(self):
-		return "<CreditCard (apr='{}', creditLimit='{}', balance='{}', interest='{}', openDate='{:%Y-%m-%d}', lastTransactionDate,='{:%Y-%m-%d}', dueDate='{:%Y-%m-%d}') >".format(self.apr, self.creditLimit, self.balance, self.interest, self.openDate, self.lastTransactionDate, self.dueDate)
+		return "<CreditCard (Owner='{}', apr='{}', creditLimit='{}', balance='{}', interest='{}', openDate='{:%Y-%m-%d}', lastTransactionDate,='{:%Y-%m-%d}', dueDate='{:%Y-%m-%d}') >".format(self.username, self.apr, self.creditLimit, self.balance, self.interest, self.openDate, self.lastTransactionDate, self.dueDate)
 
 	def update(self, fieldName, newVal, session):
-		if fieldName=='apr':
+		if fieldName=='username':
+			self.username = newVal
+		elif fieldName=='apr':
 			self.apr = newVal
 		elif fieldName=='creditLimit':
 			self.creditLimit = newVal
 		elif fieldName=='balance':
 			self.balance += newVal
 		elif fieldName=='interest':
-			self.interest += newVal
+			self.interest = newVal
 		elif fieldName=='openDate':
 			self.openDate = newVal
 		elif fieldName=='lastTransactionDate':
@@ -41,6 +45,6 @@ class CreditCard(DBActions):
 		elif fieldName=='dueDate':
 			self.dueDate = newVal
 		else:
-			raise 'Transaction.py: getByFieldName - not valid field'
+			raise Exception('Transaction.py: update failed - not valid field:', fieldName)
 
 		session.flush()

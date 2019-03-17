@@ -22,9 +22,10 @@ class Transaction(DBActions):
 		return "<Transaction (username='{}', amount='{}', transactionType='{}' transactionDate='{:%Y-%m-%d}'>".format(self.username, self.amount, self.transactionType.name, self.transactionDate)
 
 	def create(self, session):
+		print(self)
 		super().create(session)
 		changeInBalance = self.amount*self.transactionType.value
-		Util.updateBalance(self.username, changeInBalance, session)
+		Util.updateCreditCard(self.username, changeInBalance, self.transactionDate, session)
 
 	def update(self, fieldName, newVal, session):
 		if fieldName=='transactionCardNumber':

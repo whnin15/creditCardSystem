@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Table, MetaData, Column, String, Numeric, Integer, BigInteger, DateTime, Enum, ForeignKey
+from sqlalchemy import Table, MetaData, Column, String, Numeric, Integer, BigInteger, Float, DateTime, Enum, ForeignKey
 from sqlalchemy.orm import mapper
 from User import User
 from CreditCard import CreditCard
@@ -21,13 +21,13 @@ class DBConnect:
 		#credit card table object
 		creditCards = Table('CreditCards', self.meta,
 			Column( 'accountNumber', BigInteger, primary_key=True),
-			Column( 'apr', Integer, nullable=False),
-			Column( 'creditLimit', Integer, nullable=False),
-			Column( 'balance', Integer, nullable=False, default=0),
+			Column( 'apr', Float, nullable=False),
+			Column( 'creditLimit', Float, nullable=False),
+			Column( 'balance', Float, nullable=False, default=0),
+			Column( 'interest', Float, nullable=False, default=0),
 			Column( 'openDate', DateTime, nullable=False ),
-			Column( 'dueDate', DateTime, nullable=False ),
-			# Column( 'lastTransactionID', Integer, nullable=False, ForeignKey("Transaction.transactionID") ), #maybe connect with transaction table and get it from there
-			Column( 'interest', Integer, nullable=False, default=0)
+			Column( 'lastTransactionDate', DateTime, nullable=False ),
+			Column( 'dueDate', DateTime, nullable=False )
 		)
 		creditCards.create(self.engine, checkfirst=True) # create the table if it doesn't exist yet
 		mapper(CreditCard, creditCards) # mapping creditCards table object to the CreditCard class∂aw

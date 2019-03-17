@@ -6,6 +6,8 @@ from User import User
 from CreditCard import CreditCard
 from Transaction import Transaction
 from Transaction import TransactionType
+from Util import Util
+from datetime import datetime
 
 class Test:
 
@@ -32,9 +34,12 @@ class Test:
 	u1.update('password','pwd', session)
 
 	#testing transactions
-	t1 = Transaction(u1.username, 1000, TransactionType.CHARGE)
-	t1.create(session)
+	u1=session.query(User).filter_by(username='wint').first()
+
 	t2 = Transaction(u1.username, 200, TransactionType.PAYMENT)
 	t2.create(session)
+	t1 = Transaction(u1.username, 1000, TransactionType.CHARGE, datetime.strptime('2019-04-01', '%Y-%m-%d'))
+	t1.create(session)
 
+	print( Util.getInterest(u1.username, datetime.today(), datetime.strptime('2019-03-20', '%Y-%m-%d'), session ) )
 	session.commit() #close the sesssion

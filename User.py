@@ -2,19 +2,19 @@ from DBActions import DBActions
 
 class User(DBActions):
 
-	def __init__(self, username, password, fullname, email):
+	def __init__(self, username, password, fullname, email, streetAddress="", city="", state="", zipCode=0, preferredPhoneNumber=0, phoneNumber1=0, creditCardNumber=None):
 		# self.user_id = user_id
 		self.username = username
 		self.password = password
 		self.fullname = fullname
 		self.email = email
-		self.streetAddress = ""
-		self.city = ""
-		self.state = ""
-		self.zipCode = 00000
-		self.preferredPhoneNumber = 0
-		self.phoneNumber1 = 0
-		self.creditCardNumber = 1
+		self.streetAddress = streetAddress
+		self.city = city
+		self.state = state
+		self.zipCode = zipCode
+		self.preferredPhoneNumber = preferredPhoneNumber
+		self.phoneNumber1 = phoneNumber1
+		self.creditCardNumber = creditCardNumber
 
 	def __repr__(self):
 		return "<User(username='%s', fullname='%s', email='%s', address='%s','%s','%s','%d', preferredPhone='%d', creditCard='%d')>" % (self.username, self.fullname, self.email, self.streetAddress, self.city, self.state, self.zipCode, self.preferredPhoneNumber, self.creditCardNumber)

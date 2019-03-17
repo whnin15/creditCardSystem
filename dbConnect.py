@@ -1,11 +1,11 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Table, MetaData, Column, String, Numeric, Integer, BigInteger, DateTime, ForeignKey
+from sqlalchemy import Table, MetaData, Column, String, Numeric, Integer, BigInteger, DateTime, Enum, ForeignKey
 from sqlalchemy.orm import mapper
 from User import User
 from CreditCard import CreditCard
 from Transaction import Transaction
-
+from Transaction import TransactionType
 
 class DBConnect:
 	
@@ -58,7 +58,7 @@ class DBConnect:
 			Column( 'payerCard', BigInteger, ForeignKey("CreditCards.accountNumber"), nullable=False),
 			Column( 'payeeCard', BigInteger, ForeignKey("CreditCards.accountNumber"), nullable=False),
 			Column( 'amount', Integer, nullable=False ),
-			Column( 'transactionType', String(20), nullable=False),
+			Column( 'transactionType', Enum(TransactionType), nullable=False),
 			Column( 'transactionDate', DateTime, nullable=False )
 		)
 		transactions.create(self.engine, checkfirst=True) # create the table if it doesn't exist yet
@@ -67,7 +67,7 @@ class DBConnect:
 	def run(self):
 		self.createCreditCardTable()
 		self.createUserTable()
-		self.createTransactionTable
+		self.createTransactionTable()
 
 	def getEngine(self):
 		return self.engine

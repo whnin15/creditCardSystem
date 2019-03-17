@@ -9,6 +9,7 @@ Main functions:
 Current Assumptions/Limits:
 ===========================
 We can only create one credit card for one user.
+Credit limit is not important.
 
 Classes(.py):
 ============

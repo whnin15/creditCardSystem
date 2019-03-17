@@ -15,6 +15,8 @@ class CreditCard(DBActions):
 		self.username = username
 		self.apr = apr/100
 		self.creditLimit = creditLimit
+		if (charge > self.creditLimit):
+			raise Exception('charge is over limit. Failed.')
 		self.balance = charge
 		self.interest = interest
 		self.openDate = openDate
@@ -35,6 +37,8 @@ class CreditCard(DBActions):
 		elif fieldName=='creditLimit':
 			self.creditLimit = newVal
 		elif fieldName=='balance':
+			if (charge > self.creditLimit):
+				raise Exception('charge is over limit. Failed.')
 			self.balance += newVal
 		elif fieldName=='interest':
 			self.interest = newVal

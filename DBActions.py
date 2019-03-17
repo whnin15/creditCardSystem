@@ -10,9 +10,10 @@ class DBActions():
 	def __repr__(self):
 		pass
 
+	@abstractmethod
 	def create(self, session):
 		session.add(self)
-		session.commit()
+		session.flush()
 
 	@abstractmethod
 	def update(self, fieldName, newValue, session):
@@ -20,5 +21,5 @@ class DBActions():
 
 	def delete(queryObj, session):
 		session.delete(queryObj)
-		session.commit()
+		session.flush()
 		

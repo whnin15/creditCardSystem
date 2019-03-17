@@ -46,7 +46,7 @@ class DBConnect:
 			Column( 'zipCode', Numeric(5) ),
 			Column( 'preferredPhoneNumber', Numeric(10) ),
 			Column( 'phoneNumber1', Numeric(10) ),
-			Column( 'creditCardNumber', BigInteger, ForeignKey("CreditCards.accountNumber") ) #foreign key
+			Column( 'creditCardNumber', BigInteger, ForeignKey("CreditCards.accountNumber"), unique=True ) #foreign key
 		)
 		users.create(self.engine, checkfirst=True) # create the table if it doesn't exist yet
 		mapper(User, users) # mapping users table object to the User class
@@ -55,8 +55,8 @@ class DBConnect:
 		# transaction table object
 		transactions = Table('Transactions', self.meta,
 			Column( 'transaction_id', Integer, primary_key=True ),
-			Column( 'payerCard', BigInteger, ForeignKey("CreditCards.accountNumber"), nullable=False),
-			Column( 'payeeCard', BigInteger, ForeignKey("CreditCards.accountNumber"), nullable=False),
+			Column( 'username', String(50), ForeignKey("Users.username"), nullable=False),
+			# Column( 'payeeCard', BigInteger, ForeignKey("CreditCards.accountNumber"), nullable=False),
 			Column( 'amount', Integer, nullable=False ),
 			Column( 'transactionType', Enum(TransactionType), nullable=False),
 			Column( 'transactionDate', DateTime, nullable=False )

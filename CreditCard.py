@@ -10,7 +10,7 @@ class AccountType(Enum):
 
 class CreditCard(DBActions):
 
-	def __init__(self, apr, creditLimit, charge=0, interest=0, openDate=datetime.now().date(), dueDate=None):
+	def __init__(self, apr, creditLimit, charge=0, interest=0, openDate=datetime.today(), dueDate=None):
 		self.apr = apr
 		self.creditLimit = creditLimit
 		self.balance = charge
@@ -22,7 +22,7 @@ class CreditCard(DBActions):
 			self.dueDate = dueDate
 
 	def __repr__(self):
-		return "<CreditCard (apr='%d', creditLimit='%d', balance='%d', openDate='{%Y-%m-%d}', dueDate='{%Y-%m-%d}', interest='%d') >" % (self.apr, self.creditLimit, self.balance, self.openDate, self.dueDate, self.interest)
+		return "<CreditCard (apr='{}', creditLimit='{}', balance='{}', interest='{}', openDate='{:%Y-%m-%d}', dueDate='{:%Y-%m-%d}') >".format(self.apr, self.creditLimit, self.balance, self.interest, self.openDate, self.dueDate)
 
 	def update(self, fieldName, newVal, session):
 		if fieldName=='apr':
@@ -30,14 +30,14 @@ class CreditCard(DBActions):
 		elif fieldName=='creditLimit':
 			self.creditLimit = newVal
 		elif fieldName=='balance':
-			self.balance = newVal
+			self.balance += newVal
 		elif fieldName=='openDate':
 			self.openDate = newVal
 		elif fieldName=='dueDate':
 			self.dueDate = newVal
 		elif fieldName=='interest':
-			self.interest = newVal
+			self.interest += newVal
 		else:
 			raise 'Transaction.py: getByFieldName - not valid field'
 
-		session.commit()
+		session.flush()

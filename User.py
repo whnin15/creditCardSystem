@@ -3,7 +3,6 @@ from DBActions import DBActions
 class User(DBActions):
 
 	def __init__(self, username, password, fullname, email, streetAddress="", city="", state="", zipCode=0, preferredPhoneNumber=0, phoneNumber1=0, creditCardNumber=None):
-		# self.user_id = user_id
 		self.username = username
 		self.password = password
 		self.fullname = fullname
@@ -17,7 +16,7 @@ class User(DBActions):
 		self.creditCardNumber = creditCardNumber
 
 	def __repr__(self):
-		return "<User(username='%s', fullname='%s', email='%s', address='%s','%s','%s','%d', preferredPhone='%d', creditCard='%d')>" % (self.username, self.fullname, self.email, self.streetAddress, self.city, self.state, self.zipCode, self.preferredPhoneNumber, self.creditCardNumber)
+		return "<User(username='{}', fullname='{}', email='{}', address='{}','{}','{}','{}', preferredPhone='{}', creditCardNumber='{}')>".format(self.username, self.fullname, self.email, self.streetAddress, self.city, self.state, self.zipCode, self.preferredPhoneNumber, self.creditCardNumber)
 
 	def update(self, fieldName, newVal, session):
 		if fieldName=='username':
@@ -46,4 +45,4 @@ class User(DBActions):
 		else:
 			raise 'User.py: getByFieldName - not valid field'
 
-		session.commit()
+		session.flush()

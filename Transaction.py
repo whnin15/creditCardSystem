@@ -1,28 +1,34 @@
 from datetime import datetime
-from DBActions import DBActions
 from enum import Enum
+from DBActions import DBActions
+from User import User
+from CreditCard import CreditCard
+from Util import Util
 
 class TransactionType(Enum):
-	WITHDRAWAL = 1
-	DEPOSIT = -1
+	CHARGE = 1
+	PAYMENT = -1
 	ADDINTEREST = 0
 
 class Transaction(DBActions):
-	def __init__(self, payer, payee, amount, transactionType, transactionDate=datetime.now()):
-		self.payerCard = payer
-		self.payeeCard = payee
+	def __init__(self, username, amount, transactionType, transactionDate=datetime.today()):
+		self.username = username
+		# self.payeeCard = payee
 		self.amount = amount
 		self.transactionType = transactionType
 		self.transactionDate = transactionDate
 	
 	def __repr__(self):
-		return "<Transaction (payerUsername='%s', payeeUsername='%s', amount='%d', transactionType='%s' transactionDate='{%Y-%m-%d}'>" % (self.payerCard, self.payeeCard, self.amount, self.transactionType.name, self.transactionDate)
+		return "<Transaction (username='{}', amount='{}', transactionType='{}' transactionDate='{:%Y-%m-%d}'>".format(self.username, self.amount, self.transactionType.name, self.transactionDate)
+
+	def create(self, session):
+		super().create(session)
+		changeInBalance = self.amount*self.transactionType.value
+		Util.updateBalance(self.username, changeInBalance, session)
 
 	def update(self, fieldName, newVal, session):
-		if fieldName=='payerCard':
-			self.payerCard = newVal
-		elif fieldName=='payeeCard':
-			self.payeeCard = newVal
+		if fieldName=='transactionCardNumber':
+			self.transactionCardNumber = newVal
 		elif fieldName=='amount':
 			self.amount = newVal
 		elif fieldName=='transactionType':
@@ -32,7 +38,7 @@ class Transaction(DBActions):
 		else:
 			raise 'Transaction.py: getByFieldName - not valid field'
 
-		session.commit()
+		session.flush()
 
 
 	#add interest whenever i call this transaction

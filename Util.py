@@ -1,23 +1,22 @@
 from datetime import datetime
 from datetime import timedelta
 from CreditCard import AccountType
-from CreditCard import TransactionType
-from CreditCard import CreditCard
 from User import User
+from CreditCard import CreditCard
 
 class Util:
 
-	# def addTransaction(payer, payee, amount):
-	# 	# create a transaction ID
+	def updateBalance(username, changeInBalance, session):
+		user = session.query(User).filter_by(username=username).all()
+		if len(user) > 1:
+			raise 'duplicate usernames'
 
-	# 	# what if more than one card per account
-	# 	transactionDate = datetime.now().date()
+		transactionCard = session.query(CreditCard).filter_by(accountNumber=user[0].creditCardNumber).all()
+		if len(transactionCard) > 1:
+			raise 'duplicate credit card account number'
+		transactionCard[0].update('balance', changeInBalance, session)
 
-	# 	CardToWithdraw = payer.getCard(AccountType.credit)
-	# 	CardToDeposit = payee.getCard(AccountType.credit)
 
-	# 	CardToWithdraw.updateBalance(transactionDate, amount, TransactionType.withdrawal)
-	# 	CardToDeposit.updateBalance(transactionDate, amount, TransactionType.deposit)
 	def cardIsOverDue(card, session):
 		creditCard = session.query(CreditCard).filter_by(cardNumber=card).all()
 		if (creditCard.dueDate < datetime.now().date() ):

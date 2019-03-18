@@ -19,7 +19,7 @@ class CreditCard(DBActions):
 			# what should be the right behavior when over draft?
 			raise Exception('charge is over limit. Failed.')
 		self.balance = charge
-		# add to transaction when there is a charge (need to find a way not to circle between modules)
+		# TODO: add to transaction when there is a charge (need to find a way not to circle between modules)
 		self.interest = interest
 		self.openDate = openDate.replace(hour=0, minute=0, second=0, microsecond=0)
 		self.lastTransactionDate = openDate

@@ -17,9 +17,9 @@ class DBConnect:
 		self.meta = MetaData(bind=self.engine)
 		self.meta.create_all(self.engine)
 
-	def createUserTable(self):
+	def createUserObj(self):
 		# user table object
-		users = Table('Users', self.meta,
+		self.users = Table('Users', self.meta,
 			Column( 'user_id', Integer, primary_key=True ),
 			Column( 'username', String(50), nullable=False, unique=True),
 			Column( 'password', String(50), nullable=False ),
@@ -32,12 +32,14 @@ class DBConnect:
 			Column( 'preferredPhoneNumber', Numeric(10) ),
 			Column( 'phoneNumber1', Numeric(10) )
 		)
-		users.create(self.engine, checkfirst=True) # create the table if it doesn't exist yet
-		mapper(User, users) # mapping users table object to the User class
 
-	def createCreditCardTable(self):
+	def createUserTable(self):
+		self.users.create(self.engine, checkfirst=True) # create the table if it doesn't exist yet
+		mapper(User, self.users) # mapping users table object to the User class
+
+	def createCreditCardObj(self):
 		#credit card table object
-		creditCards = Table('CreditCards', self.meta,
+		self.creditCards = Table('CreditCards', self.meta,
 			Column( 'accountNumber', BigInteger, primary_key=True),
 			Column( 'apr', Float, nullable=False),
 			Column( 'creditLimit', Float, nullable=False),
@@ -48,12 +50,14 @@ class DBConnect:
 			Column( 'dueDate', DateTime, nullable=False ),
 			Column( 'username', String(50), ForeignKey("Users.username"), nullable=False ) #foreign key
 		)
-		creditCards.create(self.engine, checkfirst=True) # create the table if it doesn't exist yet
-		mapper(CreditCard, creditCards) # mapping creditCards table object to the CreditCard class∂aw
 
-	def createTransactionTable(self):	
+	def createCreditCardTable(self):
+		self.creditCards.create(self.engine, checkfirst=True) # create the table if it doesn't exist yet
+		mapper(CreditCard, self.creditCards) # mapping creditCards table object to the CreditCard class∂aw
+
+	def createTransactionObj(self):	
 		# transaction table object
-		transactions = Table('Transactions', self.meta,
+		self.transactions = Table('Transactions', self.meta,
 			Column( 'transaction_id', Integer, primary_key=True ),
 			Column( 'username', String(50), ForeignKey("Users.username"), nullable=False),
 			# Column( 'payeeCard', BigInteger, ForeignKey("CreditCards.accountNumber"), nullable=False),
@@ -61,10 +65,22 @@ class DBConnect:
 			Column( 'transactionType', Enum(TransactionType), nullable=False),
 			Column( 'transactionDate', DateTime, nullable=False )
 		)
-		transactions.create(self.engine, checkfirst=True) # create the table if it doesn't exist yet
-		mapper(Transaction, transactions) # mapping transactions table object to the Transaction class
+
+	def createTransactionTable(self):
+		self.transactions.create(self.engine, checkfirst=True) # create the table if it doesn't exist yet
+		mapper(Transaction, self.transactions) # mapping transactions table object to the Transaction class
+
+	def clearTables(self):
+		print('clearning')
+		self.meta.drop_all()
 
 	def run(self):
+		self.createUserObj()
+		self.createCreditCardObj()
+		self.createTransactionObj()
+
+		self.clearTables()
+
 		self.createUserTable()
 		self.createCreditCardTable()
 		self.createTransactionTable()

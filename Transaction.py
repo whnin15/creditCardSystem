@@ -29,7 +29,7 @@ class Transaction(DBActions):
 		if fieldName=='transactionCardNumber':
 			self.transactionCardNumber = newVal
 		elif fieldName=='amount':
-			#### NEED TO UPDATE THE AMOUNT in CREDIT CARD
+			#### TODO: NEED TO UPDATE THE AMOUNT in CREDIT CARD
 			self.amount = newVal
 		elif fieldName=='transactionType':
 			self.transactionType = newVal

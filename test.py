@@ -1,7 +1,6 @@
 import unittest
 from dbConnect import DBConnect
 from sqlalchemy.orm import sessionmaker
-from DBActions import DBActions
 from User import User
 from CreditCard import CreditCard
 from Transaction import Transaction
@@ -10,41 +9,109 @@ from Util import Util
 from datetime import datetime
 from datetime import timedelta
 
-class Test:
 
-	db = DBConnect()
-	db.run()
+db = DBConnect()
+db.run()
 
-	# workspace
-	Session = sessionmaker(bind=db.getEngine())
-	session = Session()
+# workspace
+Session = sessionmaker(bind=db.getEngine())
+session = Session()
 
-	#adding user accounts
-	u1 = User(username='wint', password='wint', fullname='WYH', email='test') # creating a user instance
-	u1.create(session)
+class TestTables(unittest.TestCase):
 
-	#creating a credit card
-	c1=CreditCard(u1.username, 35, 1000, 500)
-	c1.create(session)
-	c1=session.query(CreditCard).first()
+	def test01_insert_rows(self):
+		u1 = User('customer1', 'customer1', 'Customer One', 'customer1@gmail.com', city="Chicago", state="IL") # creating a user instance
+		u1.create(session) #adding user account
+		session.commit()
+		self.assertIsNotNone( session.query(User).filter_by(username='customer1').scalar(), "Row is not inserted for Users Table" )
 
-	# u2 = User(username='test', password='wint', fullname='Testing', email='test@') # creating a user instance
-	# u3 = User(username='nnn', password='newpwd', fullname='WYH', email='test~') # creating a user instance
-	# u2.create(session)
+		c1 = CreditCard( u1.username, 20, 1000)
+		c1.create(session)
+		session.commit()
+		self.assertIsNotNone( session.query(CreditCard).filter_by(username='customer1').scalar(), "Row is not inserted for CreditCards Table" )
 
-	#updating User u1 object
-	u1.update('password','pwd', session)
+		t1 = Transaction( u1.username, 500, TransactionType.CHARGE)
+		t1.create(session)
+		session.commit()
+		self.assertIsNotNone( session.query(Transaction).filter_by(username='customer1').scalar(), "Row is not inserted for Transactions Table" )
 
-	#testing transactions
-	# u1=session.query(User).filter_by(username='wint').first()
 
-	# t1 = Transaction(u1.username, 200, TransactionType.PAYMENT, c1.openDate+timedelta(days=15) )
-	# t1.create(session)
-	# t2 = Transaction(u1.username, 100, TransactionType.CHARGE, c1.openDate+timedelta(days=25) )
-	# t2.create(session)
-	# t3 = Transaction(u1.username, 400, TransactionType.PAYMENT, c1.openDate+timedelta(days=35) )
-	# t3.create(session) 
+	def test02_update_rows(self):
+		u1 = session.query(User).filter_by(username='customer1').first()
+		self.assertEqual( session.query(User).filter_by(username='customer1').first().state, 'IL', "Row is not updated for Users Table" )
+		u1.update('state', 'MI', session)
+		session.commit()
+		self.assertEqual( session.query(User).filter_by(username='customer1').first().state, 'MI', "Row is not updated for Users Table" )
 
-	# # print( Util.getInterest( u1.username, c1.lastTransactionDate, c1.openDate+timedelta(days=35), session ) )
+		c1 = session.query(CreditCard).filter_by(username='customer1').first()
+		self.assertEqual( session.query(CreditCard).filter_by(username='customer1').first().apr, 0.2, "Row is not updated for CreditCards Table" )
+		c1.update('apr', 35, session) #adding user account
+		session.commit()
+		self.assertEqual( session.query(CreditCard).filter_by(username='customer1').first().apr, 0.35, "Row is not updated for CreditCards Table" )
 
-	session.commit() #close the sesssion
+		t1 = session.query(Transaction).filter_by(username='customer1').first()
+		self.assertEqual( session.query(Transaction).filter_by(username='customer1').first().transactionType, TransactionType.CHARGE, "Row is not updated for Transactions Table" )
+		t1.update('transactionType', TransactionType.PAYMENT, session) #adding user account
+		session.commit()
+		self.assertEqual( session.query(Transaction).filter_by(username='customer1').first().transactionType, TransactionType.PAYMENT, "Row is not updated for Transactions Table" )
+
+
+	def test03_delete_rows(self):
+		c1 = session.query(CreditCard).filter_by(username='customer1').first()
+		self.assertIsNotNone( session.query(CreditCard).filter_by(username='customer1').scalar(), "Row is already deleted for CreditCards Table" )
+		c1.delete(session)
+		session.commit()
+		self.assertIsNone( session.query(CreditCard).filter_by(username='customer1').scalar(), "Row is not deleted for CreditCards Table" )
+
+		t1 = session.query(Transaction).filter_by(username='customer1').first()
+		self.assertIsNotNone( session.query(Transaction).filter_by(username='customer1').scalar(), "Row is already deleted for Transactions Table" )
+		t1.delete(session)
+		session.commit()
+		self.assertIsNone( session.query(Transaction).filter_by(username='customer1').scalar(), "Row is not deleted for Transactions Table" )
+
+		u1 = session.query(User).filter_by(username='customer1').first()
+		self.assertIsNotNone( session.query(User).filter_by(username='customer1').scalar(), "Row is already deleted for Users Table" )
+		u1.delete(session) #adding user account
+		session.commit()
+		self.assertIsNone( session.query(User).filter_by(username='customer1').scalar(), "Row is not deleted for Users Table" )
+
+
+class TestUtil(unittest.TestCase):
+
+	def createInstances(self):
+		u1 = User('customer1', 'customer1', 'Customer One', 'customer1@gmail.com', city="Chicago", state="IL")
+		u1.create(session)
+		c1 = CreditCard( u1.username, 35, 1000, 500)
+		c1.create(session)
+		session.commit()
+
+	def removedTime(self, fromDate):
+		return fromDate.replace(hour=0, minute=0, second=0, microsecond=0)
+
+	def test01_cardIsOverDue(self):
+		self.assertEqual( Util.cardIsOverDue( datetime.today(), datetime.today()+timedelta(days=1) ), True, "Test01: Util.cardIsOverDue() failed." )
+
+	def test02_cardIsNotOverDue(self):
+		self.assertEqual( Util.cardIsOverDue( datetime.today()+timedelta(days=1), datetime.today() ), False, "Test02: Util.cardIsOverDue() failed." )
+
+	def test03_interest(self):
+		self.createInstances()
+		today = self.removedTime(datetime.today())
+		self.assertEqual( Util.getInterest( 'customer1', today, today+timedelta(days=30), session ), 14.38, "Test03: Util.getInterest() failed." )
+
+	def test04_interest(self):
+		interest = 0
+		today = self.removedTime(datetime.today())
+		interest += Util.getInterest( 'customer1', today, today+timedelta(days=15), session, 500 )
+		interest += Util.getInterest( 'customer1', today+timedelta(days=15), today+timedelta(days=25), session, 300 )
+		interest += Util.getInterest( 'customer1', today+timedelta(days=25), today+timedelta(days=30), session, 400 )
+		session.commit()
+		self.assertEqual( interest, 11.99, "Test04: Util.getInterest() failed." )
+
+	def test05_overDueInterest(self):
+		today = self.removedTime(datetime.today())
+		self.assertEqual( Util.getInterest( 'customer1', today, today+timedelta(days=35), session, 500 ), 16.85, "Test05: Util.getInterest() failed." )
+
+
+if __name__ == '__main__':
+	unittest.main()

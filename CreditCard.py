@@ -16,10 +16,12 @@ class CreditCard(DBActions):
 		self.apr = apr/100
 		self.creditLimit = creditLimit
 		if (charge > self.creditLimit):
+			# what should be the right behavior when over draft?
 			raise Exception('charge is over limit. Failed.')
 		self.balance = charge
+		# add to transaction when there is a charge (need to find a way not to circle between modules)
 		self.interest = interest
-		self.openDate = openDate
+		self.openDate = openDate.replace(hour=0, minute=0, second=0, microsecond=0)
 		self.lastTransactionDate = openDate
 		if dueDate is None:
 			self.dueDate = self.openDate+timedelta(days=30)
@@ -33,11 +35,12 @@ class CreditCard(DBActions):
 		if fieldName=='username':
 			self.username = newVal
 		elif fieldName=='apr':
-			self.apr = newVal
+			self.apr = newVal/100
 		elif fieldName=='creditLimit':
 			self.creditLimit = newVal
 		elif fieldName=='balance':
-			if (charge > self.creditLimit):
+			if ((self.balance+newVal) > self.creditLimit):
+				# what if the over limit comes from interest. May be add a overdraft fee when over credit limit
 				raise Exception('charge is over limit. Failed.')
 			self.balance += newVal
 		elif fieldName=='interest':

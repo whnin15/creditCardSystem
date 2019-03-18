@@ -15,7 +15,7 @@ class Transaction(DBActions):
 		# self.payeeCard = payee
 		self.amount = amount
 		self.transactionType = transactionType
-		self.transactionDate = transactionDate
+		self.transactionDate = transactionDate.replace(hour=0, minute=0, second=0, microsecond=0)
 	
 	def __repr__(self):
 		return "<Transaction (username='{}', amount='{}', transactionType='{}' transactionDate='{:%Y-%m-%d}'>".format(self.username, self.amount, self.transactionType.name, self.transactionDate)
@@ -29,6 +29,7 @@ class Transaction(DBActions):
 		if fieldName=='transactionCardNumber':
 			self.transactionCardNumber = newVal
 		elif fieldName=='amount':
+			#### NEED TO UPDATE THE AMOUNT in CREDIT CARD
 			self.amount = newVal
 		elif fieldName=='transactionType':
 			self.transactionType = newVal
@@ -38,6 +39,3 @@ class Transaction(DBActions):
 			raise Exception('Transaction.py: update failed - not valid field:', fieldName)
 
 		session.flush()
-
-
-	#add interest whenever i call this transaction

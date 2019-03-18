@@ -6,11 +6,7 @@ from CreditCard import CreditCard
 class Util:
 
 	def updateCreditCard(username, changeInBalance, currTransactionDate, session):
-		user = session.query(User).filter_by(username=username).all()
-		if len(user) > 1:
-			raise 'duplicate usernames'
-
-		transactionCard = session.query(CreditCard).filter_by(username=user[0].username).all()
+		transactionCard = session.query(CreditCard).filter_by(username=username).all()
 		if len(transactionCard) > 1:
 			raise 'duplicate credit card account number'
 
@@ -28,29 +24,27 @@ class Util:
 		transactionCard[0].update('lastTransactionDate', currTransactionDate, session)
 
 
-	def getInterest( username, fromDate, toDate, session ):
-		user = session.query(User).filter_by(username=username).all()
-		if len(user) > 1:
-			raise 'duplicate usernames'
-
-		transactionCard = session.query(CreditCard).filter_by(username=user[0].username).all()
+	def getInterest( username, fromDate, toDate, session, balance=None ):
+		transactionCard = session.query(CreditCard).filter_by(username=username).all()
 		if len(transactionCard) > 1:
 			raise 'duplicate credit card account number'
 
-		balance = transactionCard[0].balance
+		if balance is None:
+			balance = transactionCard[0].balance
+		totalInterest = 0
 		dueDate = transactionCard[0].dueDate
-		prev_interest = transactionCard[0].interest
 		while Util.cardIsOverDue(dueDate, toDate):
-			balance += prev_interest + Util.calculateInterest( balance, transactionCard[0].apr, fromDate, dueDate ) # calculate interest up to due date
-			prev_interest = 0
+			interest = Util.calculateInterest( balance, transactionCard[0].apr, fromDate, dueDate ) # calculate interest up to due date
+			totalInterest += interest
+			balance += interest
 			fromDate = dueDate
 			dueDate = dueDate + timedelta(days=30)
 		
-		return Util.calculateInterest( balance, transactionCard[0].apr, fromDate, toDate ) + (balance - transactionCard[0].balance)
+		return Util.calculateInterest( balance, transactionCard[0].apr, fromDate, toDate ) + totalInterest
 
 
 	def calculateInterest( balance, apr, fromDate, toDate ):
-		print('inside: ', balance, fromDate, toDate, (fromDate - toDate).days, apr )
+		# print('inside: ', balance, fromDate, toDate, (toDate - fromDate).days, apr )
 		if (balance <= 0):
 			return 0
 		dayRange = (toDate - fromDate).days

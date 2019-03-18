@@ -2,7 +2,7 @@ from DBActions import DBActions
 
 class User(DBActions):
 
-	def __init__(self, username, password, fullname, email, streetAddress="", city="", state="", zipCode=0, preferredPhoneNumber=0, phoneNumber1=0, creditCardNumber=None):
+	def __init__(self, username, password, fullname, email, streetAddress="", city="", state="", zipCode=0, preferredPhoneNumber=0, phoneNumber1=0):
 		self.username = username
 		self.password = password
 		self.fullname = fullname

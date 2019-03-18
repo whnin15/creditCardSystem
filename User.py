@@ -1,7 +1,9 @@
 from DBActions import DBActions
 
+# User class (mapped to users table)
 class User(DBActions):
 
+	#constructor
 	def __init__(self, username, password, fullname, email, streetAddress="", city="", state="", zipCode=0, preferredPhoneNumber=0, phoneNumber1=0):
 		self.username = username
 		self.password = password
@@ -14,9 +16,11 @@ class User(DBActions):
 		self.preferredPhoneNumber = preferredPhoneNumber
 		self.phoneNumber1 = phoneNumber1
 
+	#representation of a user row
 	def __repr__(self):
 		return "<User(username='{}', fullname='{}', email='{}', address='{}','{}','{}','{}', preferredPhone='{}')>".format(self.username, self.fullname, self.email, self.streetAddress, self.city, self.state, self.zipCode, self.preferredPhoneNumber)
 
+	#updating the column value in the field for the user object
 	def update(self, fieldName, newVal, session):
 		if fieldName=='username':
 			self.username = newVal

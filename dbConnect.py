@@ -7,6 +7,7 @@ from CreditCard import CreditCard
 from Transaction import Transaction
 from Transaction import TransactionType
 
+# connecting to DB and creating tables
 class DBConnect:
 	
 	def __init__(self):
@@ -60,7 +61,6 @@ class DBConnect:
 		self.transactions = Table('Transactions', self.meta,
 			Column( 'transaction_id', Integer, primary_key=True ),
 			Column( 'username', String(50), ForeignKey("Users.username"), nullable=False),
-			# Column( 'payeeCard', BigInteger, ForeignKey("CreditCards.accountNumber"), nullable=False),
 			Column( 'amount', Integer, nullable=False ),
 			Column( 'transactionType', Enum(TransactionType), nullable=False),
 			Column( 'transactionDate', DateTime, nullable=False )
@@ -71,19 +71,26 @@ class DBConnect:
 		mapper(Transaction, self.transactions) # mapping transactions table object to the Transaction class
 
 	def clearTables(self):
-		print('clearning')
+		# deleting all tables (so that we can run test.py again and again)
 		self.meta.drop_all()
 
-	def run(self):
+	def createObjs(self):
+		# creating the table objects
 		self.createUserObj()
 		self.createCreditCardObj()
 		self.createTransactionObj()
 
-		self.clearTables()
-
+	def createTables(self):
+		# creating the tables
 		self.createUserTable()
 		self.createCreditCardTable()
 		self.createTransactionTable()
+
+	def run(self):
+		# create objs, delete existing ones and re-creating new ones
+		self.createObjs()
+		self.clearTables()
+		self.createTables()
 
 	def getEngine(self):
 		return self.engine

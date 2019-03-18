@@ -4,13 +4,16 @@ from enum import Enum
 from DBActions import DBActions
 from User import User
 
+# type of account enum - this is not used anywhere in the current system since only credit card exists
 class AccountType(Enum):
 	checking = 1
 	savings = 2
 	credit = 3
 
+# credit card class (mapped to creditcards table)
 class CreditCard(DBActions):
 
+	#constructor
 	def __init__(self, username, apr, creditLimit, charge=0, interest=0, openDate=datetime.today(), lastTransactionDate=None, dueDate=None):
 		self.username = username
 		self.apr = apr/100
@@ -28,9 +31,11 @@ class CreditCard(DBActions):
 		else:
 			self.dueDate = dueDate
 
+	#representation of the credit card information
 	def __repr__(self):
 		return "<CreditCard (Owner='{}', apr='{}', creditLimit='{}', balance='{}', interest='{}', openDate='{:%Y-%m-%d}', lastTransactionDate,='{:%Y-%m-%d}', dueDate='{:%Y-%m-%d}') >".format(self.username, self.apr, self.creditLimit, self.balance, self.interest, self.openDate, self.lastTransactionDate, self.dueDate)
 
+	#updating the column values in the credit card
 	def update(self, fieldName, newVal, session):
 		if fieldName=='username':
 			self.username = newVal

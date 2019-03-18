@@ -28,12 +28,14 @@ requirements.txt 	// required packages to install
 INSTRUCTIONS
 ============
 For the first time,
+```
 $ pip install -r requirements.txt
 $ mysql.server start
 $ mysql -h localhost -u root -P 8080
 $ CREATE DATABASE CreditCardSystem
+```
 
 To run the system,
-$ python test.py
+```$ python test.py```
 
 Note: this is in python3.
